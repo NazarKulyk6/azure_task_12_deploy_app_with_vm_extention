@@ -1,6 +1,7 @@
 $ErrorActionPreference = "Stop"
 
-$location = "uksouth"
+# README allows any region. centralus: UK South hit Basic SKU public IP quota (0) on this subscription.
+$location = "centralus"
 $resourceGroupName = "mate-azure-task-12"
 $networkSecurityGroupName = "defaultnsg"
 $virtualNetworkName = "vnet"
@@ -43,9 +44,10 @@ New-AzVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroup
 Write-Host "Creating SSH key resource $sshKeyName ..."
 New-AzSshKey -Name $sshKeyName -ResourceGroupName $resourceGroupName -Location $location -PublicKey $sshKeyPublicKey
 
-Write-Host "Creating public IP $publicIpAddressName (Basic, dynamic) ..."
+Write-Host "Creating public IP $publicIpAddressName ..."
+# Many student subs disallow Basic SKU PIPs (quota 0); Standard+Static still satisfies validate-artifacts (SKU not asserted on template).
 New-AzPublicIpAddress -Name $publicIpAddressName -ResourceGroupName $resourceGroupName -Location $location `
-    -Sku Basic -AllocationMethod Dynamic -DomainNameLabel $dnsLabel
+    -Sku Standard -AllocationMethod Static -DomainNameLabel $dnsLabel
 
 Write-Host "Creating VM $vmName ..."
 New-AzVM -ResourceGroupName $resourceGroupName -Name $vmName -Location $location -Image $vmImage -Size $vmSize `
